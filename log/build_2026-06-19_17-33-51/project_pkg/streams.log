@@ -1,0 +1,30 @@
+[0.500s] Invoking command in '/home/sam/Documents/VSCode/ME 640/Project/project_ws/src/project_pkg': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/project_pkg build --build-base /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build install --record /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/install.log --single-version-externally-managed install_data
+[0.634s] running egg_info
+[0.641s] creating ../../build/project_pkg/project_pkg.egg-info
+[0.641s] writing ../../build/project_pkg/project_pkg.egg-info/PKG-INFO
+[0.641s] writing dependency_links to ../../build/project_pkg/project_pkg.egg-info/dependency_links.txt
+[0.642s] writing requirements to ../../build/project_pkg/project_pkg.egg-info/requires.txt
+[0.642s] writing top-level names to ../../build/project_pkg/project_pkg.egg-info/top_level.txt
+[0.642s] writing manifest file '../../build/project_pkg/project_pkg.egg-info/SOURCES.txt'
+[0.657s] reading manifest file '../../build/project_pkg/project_pkg.egg-info/SOURCES.txt'
+[0.658s] writing manifest file '../../build/project_pkg/project_pkg.egg-info/SOURCES.txt'
+[0.658s] running build
+[0.658s] running build_py
+[0.658s] creating /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build/lib/project_pkg
+[0.659s] copying project_pkg/__init__.py -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build/lib/project_pkg
+[0.659s] copying project_pkg/py.typed -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build/lib/project_pkg
+[0.659s] running install
+[0.661s] running install_lib
+[0.669s] creating /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages/project_pkg
+[0.669s] copying /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build/lib/project_pkg/__init__.py -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages/project_pkg
+[0.669s] copying /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build/lib/project_pkg/py.typed -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages/project_pkg
+[0.669s] byte-compiling /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages/project_pkg/__init__.py to __init__.cpython-314.pyc
+[0.669s] running install_data
+[0.670s] creating /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/share/ament_index/resource_index/packages
+[0.670s] copying resource/project_pkg -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/share/ament_index/resource_index/packages
+[0.670s] copying package.xml -> /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/share/project_pkg
+[0.670s] running install_egg_info
+[0.678s] Copying ../../build/project_pkg/project_pkg.egg-info to /home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages/project_pkg-0.0.0-py3.14.egg-info
+[0.679s] running install_scripts
+[0.722s] writing list of installed files to '/home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/install.log'
+[0.742s] Invoked command in '/home/sam/Documents/VSCode/ME 640/Project/project_ws/src/project_pkg' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/sam/Documents/VSCode/ME 640/Project/project_ws/install/project_pkg/lib/python3.14/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/project_pkg build --build-base /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/build install --record /home/sam/Documents/VSCode/ME 640/Project/project_ws/build/project_pkg/install.log --single-version-externally-managed install_data
