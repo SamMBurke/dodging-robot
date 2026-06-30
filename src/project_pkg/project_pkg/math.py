@@ -29,7 +29,7 @@ def convert_to_cartesian(msg, to_3D):
 
 def get_euclidean_clusters(cartesian_points_3d, search_radius=0.5):
     '''
-    Perform euclidea clustering by first converting the point cloud data into a KD tree for efficient nearest neighbour searching, 
+    Perform euclidean clustering by first converting the point cloud data into a KD tree for efficient nearest neighbour searching, 
     then uses the kdtree.search_radius_vector_3d() function to find all points within a certain radius of each point in the point cloud
     '''
     pcd = o3d.geometry.PointCloud()
