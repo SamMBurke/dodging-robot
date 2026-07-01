@@ -66,3 +66,24 @@ def get_euclidean_clusters(cartesian_points_3d, search_radius=0.5):
         clusters.append(cluster)
 
     return clusters
+
+
+def calculate_closeness_criterion(self, C1, C2, d0):
+    c1_max = np.max(C1)
+    c1_min = np.min(C1)
+    c2_max = np.max(C2)
+    c2_min = np.min(C2)
+
+    v1 = np.array([c1_max - C1, C1 - c1_min])
+    v2 = np.array([c2_max - C2, C2 - c2_min])
+
+    D1 = np.argmin(v1) * np.linalg.norm(v1, ord=2)
+    D2 = np.argmin(v2) * np.linalg.norm(v2, ord=2)
+
+    B = 0
+
+    for i in range(len(D1)):
+        d = np.max(np.min(D1[i], D2[i]), d0)
+        B = B + 1/d
+
+    return B

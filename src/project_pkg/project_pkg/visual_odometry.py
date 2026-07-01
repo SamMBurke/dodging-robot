@@ -56,6 +56,10 @@ class LidarObjectTrackerNode(Node):
         # and use a kalman filter to predict their future positions, then use the Hungarian algorithm to match the predicted
         # cluster rectangle positions to the actual cluster rectangle positions for object tracking
         # then from the tracked objects, determine the velocities with respect to the turtlebot
+        # the actual algorithm itself is called search-based rectangle fitting
+        for cluster in clusters:
+            continue
+
         return
 
 
