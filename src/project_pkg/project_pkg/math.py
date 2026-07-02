@@ -75,23 +75,12 @@ def calculate_closeness_criterion(C1, C2, d0):
     c2_max = np.max(C2)
     c2_min = np.min(C2)
 
-    # v1 and v2 are vectors that hold all each cluster points' distance to each boundary
-    v1 = np.array([c1_max - C1, C1 - c1_min])
-    v2 = np.array([c2_max - C2, C2 - c2_min])
+    D1 = np.minimum(c1_max - C1, C1 - c1_min)
+    D2 = np.minimum(c2_max - C2, C2 - c2_min)
 
-    # these are the two distance vectors
-    D1 = np.argmin(v1) * np.linalg.norm(v1, ord=2)
-    D2 = np.argmin(v2) * np.linalg.norm(v2, ord=2)
+    d = np.maximum(np.minimum(D1, D2), d0)
 
-    # this is the criterion score calculation
-    # this value is stored per theta and the theta with the highest criterion score B, is the angle of the rectangle
-    # that optimally encompassess the cluster points based on the points-to-edges closeness 
-    B = 0
-    for i in range(len(D1)):
-        d = np.max(np.min(D1[i], D2[i]), d0)
-        B = B + 1/d
-
-    return B
+    return np.sum(1.0 / d)
 
 
 def fit_rectangle(cluster, d0):
@@ -113,25 +102,25 @@ def fit_rectangle(cluster, d0):
             q_max = q
             optimal_theta = theta
     
-    # with the optimal rectangle angle determined, we can now construct the lines of the rectangle
-    C1 = np.dot(cluster, np.array([np.cos(optimal_theta), np.sin(optimal_theta)]))
-    C2 = np.dot(cluster, np.array([np.cos(optimal_theta), np.sin(optimal_theta)]))
+    # with the optimal rectangle angle determined, we can now reconstruct the rectangle
+    e1 = np.array([np.cos(optimal_theta), np.sin(optimal_theta)])
+    e2 = np.array([-np.sin(optimal_theta), np.cos(optimal_theta)])
 
-    a1 = np.cos(optimal_theta)
-    b1 = np.sin(optimal_theta)
-    c1 = np.min(C1)
+    C1 = cluster @ e1
+    C2 = cluster @ e2
 
-    a2 = -np.sin(optimal_theta)
-    b2 = np.cos(optimal_theta)
-    c2 = np.min(C2)
+    c1_min = np.min(C1)
+    c1_max = np.max(C1)
+    c2_max = np.max(C2)
+    c2_min = np.min(C2)
 
-    a3 = np.cos(optimal_theta)
-    b3 = np.sin(optimal_theta)
-    c3 = np.max(C1)
+    e1 = np.array([np.cos(optimal_theta), np.sin(optimal_theta)])
+    e2 = np.array([-np.sin(optimal_theta), np.cos(optimal_theta)])
 
-    a4 = -np.sin(optimal_theta)
-    b4 = np.cos(optimal_theta)
-    c4 = np.max(C1)
-
-    rectangle = np.array([[a1, b1, c1], [a2, b2, c2], [a3, b3, c3], [a4, b4, c4]])
-    return rectangle
+    rectangle_corners = np.array([
+        c1_min * e1 + c2_min * e2,
+        c1_max * e1 + c2_min * e2,
+        c1_max * e1 + c2_max * e2,
+        c1_min * e1 + c2_max * e2
+    ])
+    return rectangle_corners
