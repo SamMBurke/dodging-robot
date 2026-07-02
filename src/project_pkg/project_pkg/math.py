@@ -69,19 +69,24 @@ def get_euclidean_clusters(cartesian_points_3d, search_radius=0.5):
 
 
 def calculate_closeness_criterion(self, C1, C2, d0):
+    # c1_min and c1_max are the boundaries on axis e1_hat, the rectangle edge direction vector (same goes for e2_hat)
     c1_max = np.max(C1)
     c1_min = np.min(C1)
     c2_max = np.max(C2)
     c2_min = np.min(C2)
 
+    # v1 and v2 are vectors that hold all each cluster points' distance to each boundary
     v1 = np.array([c1_max - C1, C1 - c1_min])
     v2 = np.array([c2_max - C2, C2 - c2_min])
 
+    # these are the two distance vectors
     D1 = np.argmin(v1) * np.linalg.norm(v1, ord=2)
     D2 = np.argmin(v2) * np.linalg.norm(v2, ord=2)
 
+    # this is the criterion score calculation
+    # this value is stored per theta and the theta with the highest criterion score B, is the angle of the rectangle
+    # that optimally encompassess the cluster points based on the points-to-edges closeness 
     B = 0
-
     for i in range(len(D1)):
         d = np.max(np.min(D1[i], D2[i]), d0)
         B = B + 1/d
