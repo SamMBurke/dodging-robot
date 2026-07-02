@@ -35,6 +35,9 @@ class LidarObjectTrackerNode(Node):
             f"Converted to Cartesian coordinates: {len(cartesian_points)} points."
         )
 
+        self._clusters = self.cluster_points(self, msg)
+        self.rectangles = self.get_objects(self, self._clusters)
+
     def cluster_points(self, msg):
         '''
         Uses euclidean clustering to cluster LiDAR points into distinct objects. Converts point-cloud data (pcd) 
@@ -42,9 +45,9 @@ class LidarObjectTrackerNode(Node):
         function to find all points within a certain radius of each point in the point cloud.
         '''
         cartesian_points_3d = math.convert_to_cartesian(msg, to_3D=True)
-        self._clusters = math.get_euclidean_clusters(cartesian_points_3d, search_radius=0.5)
+        clusters = math.get_euclidean_clusters(cartesian_points_3d, search_radius=0.5)
         
-        return self._clusters
+        return clusters
     
     def get_objects(self, clusters):
         '''
@@ -54,9 +57,9 @@ class LidarObjectTrackerNode(Node):
         the 4 edges are assumed to be of the form ax + by = c. The variable d0 (in meters?) represents the minimum distance threshold which 
         avoids divisions by 0 and ensures that points very close to an edge don't have too much influence in the criterion calculation.
         '''
-        self.rectangles = []
+        rectangles = []
         for cluster in clusters:
-            self.rectangles.append(math.fit_rectangle(cluster, d0=0.1))
+            rectangles.append(math.fit_rectangle(cluster, d0=0.1))
         return
 
 
