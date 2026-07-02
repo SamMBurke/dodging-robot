@@ -68,7 +68,7 @@ def get_euclidean_clusters(cartesian_points_3d, search_radius=0.5):
     return clusters
 
 
-def calculate_closeness_criterion(self, C1, C2, d0):
+def calculate_closeness_criterion(C1, C2, d0):
     # c1_min and c1_max are the boundaries on axis e1_hat, the rectangle edge direction vector (same goes for e2_hat)
     c1_max = np.max(C1)
     c1_min = np.min(C1)
@@ -92,3 +92,46 @@ def calculate_closeness_criterion(self, C1, C2, d0):
         B = B + 1/d
 
     return B
+
+
+def fit_rectangle(cluster, d0):
+    # the inputs into the criterion functions are C1 and C2 which are the projections of all the range points on the two orthogonal edges determined by theta
+    thetas = np.linspace(0, 90, 89, endpoint=False) * np.pi / 180
+    q_max = 0
+    optimal_theta = 0
+    for theta in thetas:
+        # rectangle edge direction vectors
+        e1_hat = np.array([np.cos(theta), np.sin(theta)])
+        e2_hat = np.array([-np.sin(theta), np.cos(theta)])
+
+        # projections on to the edge
+        C1 = np.dot(cluster, e1_hat)
+        C2 = np.dot(cluster, e2_hat)
+
+        q = calculate_closeness_criterion(C1, C2, d0)
+        if q > q_max: 
+            q_max = q
+            optimal_theta = theta
+    
+    # with the optimal rectangle angle determined, we can now construct the lines of the rectangle
+    C1 = np.dot(cluster, np.array([np.cos(optimal_theta), np.sin(optimal_theta)]))
+    C2 = np.dot(cluster, np.array([np.cos(optimal_theta), np.sin(optimal_theta)]))
+
+    a1 = np.cos(optimal_theta)
+    b1 = np.sin(optimal_theta)
+    c1 = np.min(C1)
+
+    a2 = -np.sin(optimal_theta)
+    b2 = np.cos(optimal_theta)
+    c2 = np.min(C2)
+
+    a3 = np.cos(optimal_theta)
+    b3 = np.sin(optimal_theta)
+    c3 = np.max(C1)
+
+    a4 = -np.sin(optimal_theta)
+    b4 = np.cos(optimal_theta)
+    c4 = np.max(C1)
+
+    rectangle = np.array([[a1, b1, c1], [a2, b2, c2], [a3, b3, c3], [a4, b4, c4]])
+    return rectangle
