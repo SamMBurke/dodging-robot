@@ -1,21 +1,18 @@
-'''
-This file will perform visual odometry to understand the object of motions
-
-- It will intake LiDAR data and detect object motion
-    - It will then send object motion data to the path_planner.py file
-'''
 import rclpy
 import rclpy.duration
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
 from project_pkg import math
+from project_interfaces import DetectedObject, DetectedObjectArray
 
 
-class LidarObjectTrackerNode(Node):
-
+class LidarObjectDetectorNode(Node):
+    '''
+    This node subscribes to the LiDAR sensor, clusters the points clouds into objects and then publishes those objects
+    '''
     def __init__(self):
-        super().__init__('lidar_object_tracker')
+        super().__init__('lidar_object_detector')
 
         self.subscription = self.create_subscription(
             LaserScan,
@@ -24,19 +21,18 @@ class LidarObjectTrackerNode(Node):
             10
         )
 
+        self.publisher = self.create_publisher(
+            DetectedObjectArray,
+            '/detected_objects',
+            10
+        )
+
     def scan_callback(self, msg):
-        # msg.ranges is a list of LiDAR distrance measurements in meters
-        self.get_logger().info(
-            f"Received {len(msg.ranges)} measurements."
-        )
+        self._clusters = self.cluster_points(msg) # cluster the data points
+        self.objects = self.get_objects(self._clusters) # fit rectangles onto those clusters to get objects
+        ros_msg = self.convert_to_ros(self.objects) # convert those objects into a ROS2 message of detected objects
+        self.publisher.publish(ros_msg) # publish the ROS2 message
 
-        cartesian_points = math.convert_to_cartesian(msg)
-        self.get_logger().info(
-            f"Converted to Cartesian coordinates: {len(cartesian_points)} points."
-        )
-
-        self._clusters = self.cluster_points(self, msg)
-        self.rectangles = self.get_objects(self, self._clusters)
 
     def cluster_points(self, msg):
         '''
@@ -57,16 +53,33 @@ class LidarObjectTrackerNode(Node):
         the 4 edges are assumed to be of the form ax + by = c. The variable d0 (in meters?) represents the minimum distance threshold which 
         avoids divisions by 0 and ensures that points very close to an edge don't have too much influence in the criterion calculation.
         '''
-        rectangles = []
-        for cluster in clusters:
-            rectangles.append(math.fit_rectangle(cluster, d0=0.1))
-        return
+        objects = []
+        for i, cluster in enumerate(clusters):
+            objects.append(math.fit_rectangle(cluster, d0=0.1, id=i))
+        return objects
+    
+    def convert_to_ros(self, objects):
+        msg = DetectedObjectArray()
+        
+        for obj in objects:
+            ros_obj = DetectedObject()
+
+            ros_obj.id = obj.id
+            ros_obj.center.x = float(obj.center[0])
+            ros_obj.center.y = float(obj.center[1])
+            ros_obj.heading = float(obj.heading)
+            ros_obj.length = float(obj.length)
+            ros_obj.width = float(obj.width)
+
+            msg.objects.append(ros_obj)
+
+        return msg
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node = LidarObjectTrackerNode()
+    node = LidarObjectDetectorNode()
 
     rclpy.spin(node)
 

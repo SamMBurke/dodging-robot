@@ -1,6 +1,9 @@
 import math
 import numpy as np
 import open3d as o3d
+import time
+
+from .objects import DetectedObject
 
 
 def convert_to_cartesian(msg, to_3D):
@@ -69,6 +72,10 @@ def get_euclidean_clusters(cartesian_points_3d, search_radius=0.5):
 
 
 def calculate_closeness_criterion(C1, C2, d0):
+    '''
+    Optimization function for the fit_rectangle function. Optimizes the rectangle 
+    fitting based on the closeness of the cluster points to the fitted rectangle edges
+    '''
     # c1_min and c1_max are the boundaries on axis e1_hat, the rectangle edge direction vector (same goes for e2_hat)
     c1_max = np.max(C1)
     c1_min = np.min(C1)
@@ -83,7 +90,12 @@ def calculate_closeness_criterion(C1, C2, d0):
     return np.sum(1.0 / d)
 
 
-def fit_rectangle(cluster, d0):
+def fit_rectangle(cluster, d0, id):
+    '''
+    Implementation of the Search-Based Rectangle Fitting algorithm. For 2D LiDAR scans, points clusters
+    are often seen as L-shapes. This function efficiently fits a rectangle to the given cluster of points.
+    The points are already clustered via the Euclidean Clustering algorithm from the get_euclidean_clusters function
+    '''
     # the inputs into the criterion functions are C1 and C2 which are the projections of all the range points on the two orthogonal edges determined by theta
     thetas = np.linspace(0, 90, 89, endpoint=False) * np.pi / 180
     q_max = 0
@@ -123,4 +135,17 @@ def fit_rectangle(cluster, d0):
         c1_max * e1 + c2_max * e2,
         c1_min * e1 + c2_max * e2
     ])
-    return rectangle_corners
+
+    rectangle_center = np.array([(rectangle_corners[0][0] + rectangle_corners[2][0])/2, (rectangle_corners[0][1] + rectangle_corners[2][1])/2])
+    length = np.linalg.norm(np.array([rectangle_corners[0], rectangle_corners[1]]))
+    width = np.linalg.norm(np.array([rectangle_corners[0], rectangle_corners[3]]))
+
+    obj = DetectedObject(
+        id = id,
+        center = rectangle_center,
+        heading = optimal_theta,
+        length = length,
+        width = width,
+        corners = rectangle_corners
+    )
+    return obj
