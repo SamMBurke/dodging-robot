@@ -3,7 +3,7 @@ import numpy as np
 import open3d as o3d
 import time
 
-from .objects import DetectedObject
+from project_pkg.objects import DetectedObject
 
 
 def convert_to_cartesian(msg, to_3D):

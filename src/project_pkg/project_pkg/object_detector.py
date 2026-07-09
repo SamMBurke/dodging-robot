@@ -4,7 +4,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
 from project_pkg import math
-from project_interfaces import DetectedObject, DetectedObjectArray
+from project_interfaces import DetectedROSObject, DetectedROSObjectArray
 
 
 class LidarObjectDetectorNode(Node):
@@ -22,7 +22,7 @@ class LidarObjectDetectorNode(Node):
         )
 
         self.publisher = self.create_publisher(
-            DetectedObjectArray,
+            DetectedROSObjectArray,
             '/detected_objects',
             10
         )
@@ -32,7 +32,6 @@ class LidarObjectDetectorNode(Node):
         self.objects = self.get_objects(self._clusters) # fit rectangles onto those clusters to get objects
         ros_msg = self.convert_to_ros(self.objects) # convert those objects into a ROS2 message of detected objects
         self.publisher.publish(ros_msg) # publish the ROS2 message
-
 
     def cluster_points(self, msg):
         '''
@@ -59,10 +58,10 @@ class LidarObjectDetectorNode(Node):
         return objects
     
     def convert_to_ros(self, objects):
-        msg = DetectedObjectArray()
+        msg = DetectedROSObjectArray()
         
         for obj in objects:
-            ros_obj = DetectedObject()
+            ros_obj = DetectedROSObject()
 
             ros_obj.id = obj.id
             ros_obj.center.x = float(obj.center[0])
@@ -70,6 +69,7 @@ class LidarObjectDetectorNode(Node):
             ros_obj.heading = float(obj.heading)
             ros_obj.length = float(obj.length)
             ros_obj.width = float(obj.width)
+            ros_obj.corners = obj.corners
 
             msg.objects.append(ros_obj)
 
