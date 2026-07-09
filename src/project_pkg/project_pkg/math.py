@@ -137,8 +137,8 @@ def fit_rectangle(cluster, d0, id):
     ])
 
     rectangle_center = np.array([(rectangle_corners[0][0] + rectangle_corners[2][0])/2, (rectangle_corners[0][1] + rectangle_corners[2][1])/2])
-    length = np.linalg.norm(np.array([rectangle_corners[0], rectangle_corners[1]]))
-    width = np.linalg.norm(np.array([rectangle_corners[0], rectangle_corners[3]]))
+    length = np.linalg.norm(rectangle_corners[0] - rectangle_corners[1])
+    width = np.linalg.norm(rectangle_corners[0] - rectangle_corners[3])
 
     obj = DetectedObject(
         id = id,
