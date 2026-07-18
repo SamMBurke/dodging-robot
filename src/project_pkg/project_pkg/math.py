@@ -149,3 +149,65 @@ def fit_rectangle(cluster, d0, id):
         corners = rectangle_corners
     )
     return obj
+
+
+def angle_difference(a, b):
+    '''
+    Smallest signed difference from angle a to angle b, wrapped to the range -pi to +pi. This is done 
+    in case there are scenarioswhere the heading angles are something like 2 degrees and 358 degrees. 
+    The difference in measured heading angles is 356 degrees but they are better described as being 
+    4 degrees apart. This is used in resolve_heading_ambiguity().
+    '''
+    return (a - b + np.pi) % (2 * np.pi) - np.pi
+
+
+def angular_lerp(a, b, alpha):
+    '''
+    Using linear interpolation (lerp) from angle a to angle b, find the angle that is alpha % of the
+    distance between angle a and angle b. alpha=0 returns angle a, and alpha=1 returns angle b.
+    '''
+    return a + alpha * angle_difference(b, a)
+
+
+def resolve_heading_ambiguity(track_heading, meas_heading, meas_length, meas_width):
+    '''
+    fit_rectangle() only searches theta over [0, 90 deg), since a rectangle's edges are
+    indistinguishable under 90-degree rotation. So a single physical orientation can show up as
+    meas_heading, meas_heading+90, +180, or +270 depending on which face of the object the LiDAR
+    sees. We pick whichever of those 4 candidates is closest to the track's current heading,
+    swapping length/width for the +90/+270 cases since the roles of the two edges swap with them.
+    '''
+    best = None
+    best_difference = np.inf
+
+    for i in range(4):
+        candidate_heading = meas_heading + i * (np.pi / 2)
+        if i % 2 == 0:
+            candidate_length, candidate_width = meas_length, meas_width
+        else:
+            candidate_length, candidate_width = meas_width, meas_length
+
+        difference = abs(angle_difference(candidate_heading, track_heading))
+        if difference < best_difference:
+            best_difference = difference
+            best = (candidate_heading, candidate_length, candidate_width)
+
+    return best
+
+
+def reconstruct_corners(center, heading, length, width):
+    '''
+    Rebuilds the 4 rectangle corners from a (smoothed) center/heading/length/width, using the same
+    corner ordering as fit_rectangle(). Used so the published box actually matches the
+    smoothed heading, rather than showing the previous frame's raw, noisier corners.
+    '''
+    e1 = np.array([np.cos(heading), np.sin(heading)])
+    e2 = np.array([-np.sin(heading), np.cos(heading)])
+    half_l, half_w = length / 2, width / 2
+
+    return np.array([
+        center - half_l * e1 - half_w * e2,
+        center + half_l * e1 - half_w * e2,
+        center + half_l * e1 + half_w * e2,
+        center - half_l * e1 + half_w * e2
+    ])

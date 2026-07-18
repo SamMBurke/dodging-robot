@@ -3,7 +3,7 @@ import rclpy.duration
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
-from project_pkg import math
+from project_pkg.math import convert_to_cartesian, get_euclidean_clusters, fit_rectangle
 from project_pkg.conversions import corners_to_ros
 from project_interfaces import DetectedROSObject, DetectedROSObjectArray
 
@@ -40,8 +40,8 @@ class LidarObjectDetectorNode(Node):
         into a KD tree for efficient nearest neighbour searching, then uses the kdtree.search_radius_vector_3d() 
         function to find all points within a certain radius of each point in the point cloud.
         '''
-        cartesian_points_3d = math.convert_to_cartesian(msg, to_3D=True)
-        clusters = math.get_euclidean_clusters(cartesian_points_3d, search_radius=0.5)
+        cartesian_points_3d = convert_to_cartesian(msg, to_3D=True)
+        clusters = get_euclidean_clusters(cartesian_points_3d, search_radius=0.5)
         
         return clusters
     
@@ -55,7 +55,7 @@ class LidarObjectDetectorNode(Node):
         '''
         objects = []
         for i, cluster in enumerate(clusters):
-            objects.append(math.fit_rectangle(cluster, d0=0.1, id=i))
+            objects.append(fit_rectangle(cluster, d0=0.1, id=i))
         return objects
     
     def convert_to_ros(self, objects, header):

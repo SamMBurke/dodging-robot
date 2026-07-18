@@ -9,3 +9,10 @@ class DetectedObject:
     length: float
     width: float
     corners: np.ndarray
+
+@dataclass
+class TrackedObject:
+    id: int
+    state: np.ndarray
+    covariance: np.ndarray
+    
