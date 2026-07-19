@@ -25,6 +25,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'lidar_object_detector_node = project_pkg.object_detector:main',
+            'object_tracker = project_pkg.object_tracker:main',
+            'tracked_objects_visualizer = project_pkg.tracked_objects_visualizer:main',
+            'fake_detection_publisher = project_pkg.fake_detection_publisher:main',
         ],
     },
 )

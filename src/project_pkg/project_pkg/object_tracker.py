@@ -5,17 +5,24 @@ from rclpy.time import Time
 
 import numpy as np
 
-from project_pkg import math
+from tf2_ros import Buffer, TransformListener, TransformException
+import tf2_geometry_msgs # registers PointStamped transform support
+from geometry_msgs.msg import PointStamped
+from std_msgs.msg import Header
+
 from project_pkg.conversions import corners_to_ros, corners_from_ros
 from project_pkg.kalman_tracker import KalmanTracker
 from project_pkg.objects import DetectedObject
-from project_interfaces import DetectedROSObjectArray, TrackedObject, TrackedObjectArray
+from project_interfaces.msg import DetectedROSObjectArray, TrackedObject, TrackedObjectArray
 
 
 class ObjectTrackerNode(Node):
 
     def __init__(self):
         super().__init__('object_tracker')
+
+        self.declare_parameter('fixed_frame', 'odom')
+        self.fixed_frame = self.get_parameter('fixed_frame').get_parameter_value().string_value
 
         self.subscription = self.create_subscription(
             DetectedROSObjectArray,
@@ -30,17 +37,35 @@ class ObjectTrackerNode(Node):
             10
         )
 
-        self.tracker = KalmanTracker(max_age=5, min_hits=3, max_valid_distance=1.5)
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
+        self.tracker = KalmanTracker(max_age = 5, min_hits = 3, max_valid_distance = 1.5)
         self._last_stamp = None
         self._default_dt = 0.1
 
     def scan_callback(self, msg):
         dt = self._compute_dt(msg.header.stamp)
 
-        detected_objects = self.convert_to_obj(msg)
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                self.fixed_frame,       # target frame: odom
+                msg.header.frame_id,    # source frame: base_link
+                msg.header.stamp,       # time of the transform
+                timeout=rclpy.duration.Duration(seconds = 0.1)
+            )
+        except TransformException as ex:
+            self.get_logger().warn(f'Could not transform {msg.header.frame_id} -> {self.fixed_frame}: {ex}. Skipping this frame.')
+            return
+
+        detected_objects = self.convert_to_obj(msg, transform)
         tracks = self.tracker.step(detected_objects, dt)
 
-        ros_msg = self.convert_to_ros(tracks, msg.header)
+        header = Header()
+        header.stamp = msg.header.stamp
+        header.frame_id = self.fixed_frame
+
+        ros_msg = self.convert_to_ros(tracks, header)
         self.publisher.publish(ros_msg)
 
     def _compute_dt(self, stamp):
@@ -51,17 +76,39 @@ class ObjectTrackerNode(Node):
             dt = (current_stamp - self._last_stamp).nanoseconds / 1e9
             if dt <= 0:
                 dt = self._default_dt
+
+        self._last_stamp = current_stamp
+        return dt
     
-    def convert_to_obj(self, msg):
+    def convert_to_obj(self, msg, transform):
+        '''
+        Transforms each detection's corners into the fixed frame, then recomputes center/heading
+        from those transformed corners (rather than transforming center/heading separately) so
+        the three stay mutually consistent after an arbitrary rotation + translation.
+        '''
         objects = []
         for object_msg in msg.objects:
+            transformed_corners = []
+            for corner in object_msg.corners:
+                point = PointStamped()
+                point.point.x = corner.x
+                point.point.y = corner.y
+                point.point.z = 0.0
+                transformed = tf2_geometry_msgs.do_transform_point(point, transform) # converts the point from the LiDAR frame to the fixed (odom) frame
+                transformed_corners.append([transformed.point.x, transformed.point.y])
+            transformed_corners = np.array(transformed_corners)
+
+            center = (transformed_corners[0] + transformed_corners[2]) / 2.0
+            edge_vector = transformed_corners[1] - transformed_corners[0]
+            heading = float(np.arctan2(edge_vector[1], edge_vector[0]))
+
             obj = DetectedObject(
                 id = object_msg.id,
-                center = np.array([object_msg.center.x, object_msg.center.y]),
-                heading = object_msg.heading,
+                center = center,
+                heading = heading,
                 length = object_msg.length,
                 width = object_msg.width,
-                corners = corners_from_ros(object_msg.corners)
+                corners = transformed_corners
             )
             objects.append(obj)
 

@@ -3,9 +3,11 @@ import rclpy.duration
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
+import numpy as np
+
 from project_pkg.math import convert_to_cartesian, get_euclidean_clusters, fit_rectangle
 from project_pkg.conversions import corners_to_ros
-from project_interfaces import DetectedROSObject, DetectedROSObjectArray
+from project_interfaces.msg import DetectedROSObject, DetectedROSObjectArray
 
 
 class LidarObjectDetectorNode(Node):
@@ -29,8 +31,13 @@ class LidarObjectDetectorNode(Node):
         )
 
     def scan_callback(self, msg):
+        self.get_logger().info(f'Received scan with {len(msg.ranges)} points')
         self._clusters = self.cluster_points(msg) # cluster the data points
+        self.get_logger().info(f'Found {len(self._clusters)} clusters')
+
         self.objects = self.get_objects(self._clusters) # fit rectangles onto those clusters to get objects
+        self.get_logger().info(f'Fitted {len(self.objects)} objects')
+        
         ros_msg = self.convert_to_ros(self.objects, msg.header) # convert those objects into a ROS2 message of detected objects
         self.publisher.publish(ros_msg) # publish the ROS2 message
 
@@ -55,7 +62,8 @@ class LidarObjectDetectorNode(Node):
         '''
         objects = []
         for i, cluster in enumerate(clusters):
-            objects.append(fit_rectangle(cluster, d0=0.1, id=i))
+            cluster_2d = np.asarray(cluster)[:, :2]  # convert 3D cluster to 2D by removing the z-coordinate
+            objects.append(fit_rectangle(cluster_2d, d0=0.1, id=i))
         return objects
     
     def convert_to_ros(self, objects, header):
