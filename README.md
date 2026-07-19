@@ -1,7 +1,8 @@
-# dodging-robot
+# Dodging Robot Project
 
+## Brief Summary
 A ROS2 package for TurtleBot4 that uses 2D LiDAR to detect and track nearby
-objects, so the robot can plan a path around them.
+objects, and then plans a path to avoid them if it detects a potential collision.
 
 **Pipeline:** raw LiDAR scan → Euclidean clustering → L-shape rectangle
 fitting → Kalman-filter tracking with Hungarian data association → tracked
