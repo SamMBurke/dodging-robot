@@ -170,7 +170,10 @@ Import path note: generated messages live under `<package>.msg`, e.g.
 | `ObjectTrackerNode` | `object_tracker_node` | `/detected_objects` | `/tracked_objects` | Transform to fixed frame, Kalman-track |
 | `TrackedObjectsVisualizer` | `tracked_objects_visualizer` | `/tracked_objects` | `/tracked_objects_markers` | Draws boxes/IDs/velocity arrows for RViz2 |
 
-Run any of them with:
+The current setup can be executed via the launch file that also launches Rviz2. If everything is setup already, build and run with the following commands:
 ```bash
-ros2 run project_pkg <executable>
+cd ~/dodging-robot
+source install/setup.bash
+colcon build --symlink-install
+ros2 launch project_pkg dodging_robot.launch.py
 ```
