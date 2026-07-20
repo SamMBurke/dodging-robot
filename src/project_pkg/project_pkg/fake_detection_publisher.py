@@ -5,7 +5,7 @@ import numpy as np
 
 from project_interfaces.msg import DetectedROSObject, DetectedROSObjectArray
 from project_pkg.conversions import corners_to_ros
-from project_pkg.kalman_tracker import reconstruct_corners  # reuse your existing corner math
+from project_pkg.kalman_tracker import reconstruct_corners
 
 
 class FakeDetectionPublisher(Node):
