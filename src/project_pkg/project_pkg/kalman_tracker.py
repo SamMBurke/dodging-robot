@@ -121,6 +121,8 @@ class Track:
         if self.time_since_update > 0:
             self.hit_streak = 0
         self.time_since_update += 1
+        # keep corners consistent with the predicted center, using last-known heading/size
+        self.corners = reconstruct_corners(self.center, self.heading, self.length, self.width)
 
     def update(self, detected_object, heading_smoothing=0.6, size_smoothing=0.6):
         self.kf.update(detected_object.center)
