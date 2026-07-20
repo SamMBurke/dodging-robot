@@ -12,7 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),  # add this
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')), 
     ],
     package_data={'': ['py.typed']},
@@ -30,7 +30,7 @@ setup(
     entry_points={
         'console_scripts': [
             'lidar_object_detector_node = project_pkg.object_detector:main',
-            'object_tracker = project_pkg.object_tracker:main',
+            'object_tracker_node = project_pkg.object_tracker:main',
             'tracked_objects_visualizer = project_pkg.tracked_objects_visualizer:main',
             'fake_detection_publisher = project_pkg.fake_detection_publisher:main',
         ],
