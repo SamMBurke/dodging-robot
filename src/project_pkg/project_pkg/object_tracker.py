@@ -47,6 +47,8 @@ class ObjectTrackerNode(Node):
     def scan_callback(self, msg):
         dt = self._compute_dt(msg.header.stamp)
 
+        # self.get_logger().info(f'Received message: {msg}')
+        # self.get_logger().info(f'Computed dt: {dt}')
         try:
             transform = self.tf_buffer.lookup_transform(
                 self.fixed_frame,       # target frame: odom
@@ -59,7 +61,9 @@ class ObjectTrackerNode(Node):
             return
 
         detected_objects = self.convert_to_obj(msg, transform)
+        # self.get_logger().info(f'Detected objects: {detected_objects}')
         tracks = self.tracker.step(detected_objects, dt)
+        # self.get_logger().info(f'Made tracks: {tracks}')
 
         header = Header()
         header.stamp = msg.header.stamp

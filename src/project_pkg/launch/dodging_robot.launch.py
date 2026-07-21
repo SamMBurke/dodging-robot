@@ -6,7 +6,7 @@ already running on the robot itself. This file only starts nodes meant to
 run on a separate lab computer connecting to the robot over the network.
 
 Usage:
-    ros2 launch project_pkg detection_and_tracking.launch.py
+    ros2 launch project_pkg dodging_robot.launch.py
 
 Optional arguments:
     fixed_frame:=<frame>     frame tracked objects are published in (default: odom)
@@ -61,7 +61,7 @@ def generate_launch_description():
     rviz_config_path = os.path.join(
         get_package_share_directory('project_pkg'),
         'rviz',
-        'detection_and_tracking.rviz'
+        'dodging_robot.rviz'
     )
 
     rviz_node = Node(

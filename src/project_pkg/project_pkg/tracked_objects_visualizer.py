@@ -23,7 +23,7 @@ class TrackedObjectsVisualizer(Node):
             10
         )
 
-        self.publisher = self.create_publisher(MarkerArray, 'tracked_objects_markers', 10)
+        self.publisher = self.create_publisher(MarkerArray, '/tracked_objects_markers', 10)
         self._prev_marker_count = 0
 
     def callback(self, msg):
@@ -77,21 +77,33 @@ class TrackedObjectsVisualizer(Node):
         marker = Marker()
         marker.header = header
         marker.ns = 'tracked_objects'
-        marker.id = obj.id * 3 + 1  # unique ID for this marker
+        marker.id = obj.id * 3 + 1
+        marker.type = Marker.TEXT_VIEW_FACING
+        marker.action = Marker.ADD
+        marker.pose.position.x = obj.center.x
+        marker.pose.position.y = obj.center.y
+        marker.pose.position.z = 0.5
+        marker.scale.z = 0.3  # font size
+        marker.color.r, marker.color.g, marker.color.b, marker.color.a = 1.0, 1.0, 1.0, 1.0
+        marker.text = f'id {obj.id}'
+        marker.lifetime = Duration(seconds=0.3).to_msg()
+        return marker
+
+    def _make_velocity_marker(self, obj, header):
+        marker = Marker()
+        marker.header = header
+        marker.ns = 'tracked_objects'
+        marker.id = obj.id * 3 + 2
         marker.type = Marker.ARROW
         marker.action = Marker.ADD
-        marker.scale.x = 0.05
-        marker.scale.y = 0.1
-        marker.scale.z = 0.0
+        marker.scale.x, marker.scale.y, marker.scale.z = 0.05, 0.1, 0.1
+        marker.color.r, marker.color.g, marker.color.b, marker.color.a = 1.0, 0.6, 0.0, 1.0
 
-        start = Point(x = obj.center.x, y = obj.center.y, z = 0.1)
-        # arrow tip = position 1 second from now at current velocity -- length directly shows speed
-        end = Point(x = obj.center.x + obj.velocity.x, y = obj.center.y + obj.velocity.y, z = 0.1)
-
+        start = Point(x=obj.center.x, y=obj.center.y, z=0.1)
+        end = Point(x=obj.center.x + obj.velocity.x, y=obj.center.y + obj.velocity.y, z=0.1)
         marker.points = [start, end]
 
         marker.lifetime = Duration(seconds=0.3).to_msg()
-
         return marker
     
 def main(args=None):
