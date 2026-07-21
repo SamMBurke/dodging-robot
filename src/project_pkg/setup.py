@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'project_pkg'
@@ -10,6 +12,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')), 
     ],
     package_data={'': ['py.typed']},
     install_requires=['setuptools'],
@@ -25,6 +29,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'lidar_object_detector_node = project_pkg.object_detector:main',
+            'object_tracker_node = project_pkg.object_tracker:main',
+            'tracked_objects_visualizer = project_pkg.tracked_objects_visualizer:main',
+            'fake_detection_publisher = project_pkg.fake_detection_publisher:main',
         ],
     },
 )
