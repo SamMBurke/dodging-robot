@@ -51,6 +51,13 @@ def generate_launch_description():
         parameters=[{'fixed_frame': LaunchConfiguration('fixed_frame')}],
     )
 
+    oa_node = Node(
+        package='project_pkg',
+        executable='oa_node',
+        name='oa_node',
+        output='screen',
+    )
+
     visualizer_node = Node(
         package='project_pkg',
         executable='tracked_objects_visualizer',
@@ -78,6 +85,7 @@ def generate_launch_description():
         launch_rviz_arg,
         detector_node,
         tracker_node,
+        oa_node,
         visualizer_node,
         rviz_node,
     ])
