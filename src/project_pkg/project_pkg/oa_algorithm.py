@@ -121,9 +121,9 @@ def step2_generate_candidates(
     vy_o: float,
     t_entry: Optional[float],
     R: float,
-    robot_radius: float = 0.18,
-    v_max: float = 0.22,
-    omega_max: float = 2.84,
+    robot_radius: float = 0.22,
+    v_max: float = 0.31,
+    omega_max: float = 1.90,
     num_angles: int = 72,
     num_radii: int = 10
 ) -> List[Dict[str, Any]]:

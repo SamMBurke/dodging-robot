@@ -30,9 +30,9 @@ class ObstacleAvoidanceNode(Node):
 
         # Parameter initialization
         self.R = 0.5                # Contact zone
-        self.robot_radius = 0.18    # TurtleBot4 footprint radius -- confirm against actual Create3 spec
-        self.v_max = 0.22           # NOTE: these match TurtleBot3 Burger specs, not confirmed Create3 values -- verify
-        self.omega_max = 2.84       # against https://iroboteducation.github.io/create3_docs/ before trusting on hardware
+        self.robot_radius = 0.22
+        self.v_max = 0.31
+        self.omega_max = 1.90
         self.L = 0.160               # Track (wheel base)
 
         # For velocity cmd
