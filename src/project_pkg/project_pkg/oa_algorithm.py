@@ -40,6 +40,22 @@ def local_to_global(px: float, py: float, robot_pose: Tuple[float, float, float]
     return (X, Y)
 
 
+def global_to_local_vector(vgx: float, vgy: float, robot_pose: Tuple[float, float, float]) -> Tuple[float, float]:
+    '''
+    Rotates a free vector (e.g. velocity) from the global frame into the robot's local frame.
+    Unlike global_to_local, this applies rotation only -- no translation -- since a velocity
+    vector has no fixed position to translate. Use this for velocities; use global_to_local
+    for positions/points.
+    '''
+    _, _, theta_r = robot_pose
+    cos_t = math.cos(theta_r)
+    sin_t = math.sin(theta_r)
+
+    vpx = vgx * cos_t + vgy * sin_t
+    vpy = -vgx * sin_t + vgy * cos_t
+    return (vpx, vpy)
+
+
 def global_to_local(gx: float, gy: float, robot_pose: Tuple[float, float, float]) -> Tuple[float, float]:
     x_r, y_r, theta_r = robot_pose
     cos_t = math.cos(theta_r)
@@ -138,15 +154,15 @@ def step2_generate_candidates(
             py = r * sin_t
             dist = math.hypot(px, py)
 
-            # Filter 1: Obstacle occupancy check
+            # Filter 1: Obstacle occupancy check (margin includes the robot's own footprint)
             dist_to_obs = math.hypot(px - x_o, py - y_o)
-            if dist_to_obs < R:
+            if dist_to_obs < R + robot_radius:
                 continue
 
-            # Filter 2: Collision check
+            # Filter 2: Collision check (same footprint margin)
             if t_entry is not None and contact_x is not None:
                 dist_to_contact = math.hypot(px - contact_x, py - contact_y)
-                if dist_to_contact < R:
+                if dist_to_contact < R + robot_radius:
                     continue
 
             # Filter 3: Time check
