@@ -48,7 +48,7 @@ class LidarObjectDetectorNode(Node):
         function to find all points within a certain radius of each point in the point cloud.
         '''
         cartesian_points_3d = convert_to_cartesian(msg, to_3D=True)
-        clusters = get_euclidean_clusters(cartesian_points_3d, search_radius=0.5)
+        clusters = get_euclidean_clusters(cartesian_points_3d, search_radius=0.3)
         
         return clusters
     
@@ -63,7 +63,7 @@ class LidarObjectDetectorNode(Node):
         objects = []
         for i, cluster in enumerate(clusters):
             cluster_2d = np.asarray(cluster)[:, :2]  # convert 3D cluster to 2D by removing the z-coordinate
-            objects.append(fit_rectangle(cluster_2d, d0=0.1, id=i))
+            objects.append(fit_rectangle(cluster_2d, d0=0.2, id=i))
         return objects
     
     def convert_to_ros(self, objects, header):

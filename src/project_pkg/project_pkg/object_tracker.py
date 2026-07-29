@@ -40,7 +40,7 @@ class ObjectTrackerNode(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        self.tracker = KalmanTracker(max_age = 5, min_hits = 3, max_valid_distance = 1.5)
+        self.tracker = KalmanTracker(max_age=10, min_hits=15, max_valid_distance=1.0)
         self._last_stamp = None
         self._default_dt = 0.1
 

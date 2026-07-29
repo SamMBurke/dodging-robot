@@ -10,7 +10,7 @@ class KalmanFilter:
     State: x = [px, py, vx, vy]^T. We only ever measure position (px, py); velocity is inferred.
     '''
 
-    def __init__(self, initial_position, dt, process_noise_std=1.0, measurement_noise_std=0.1):
+    def __init__(self, initial_position, dt, process_noise_std=1.0, measurement_noise_std=0.5):
         self.dt = dt
 
         # define the state vector of 2D position and 2D velocity
@@ -163,7 +163,7 @@ class KalmanTracker:
     object falls within the range of max_valid_distance (m)
     '''
 
-    def __init__(self, max_age=5, min_hits=3, max_valid_distance=1.5):
+    def __init__(self, max_age, min_hits, max_valid_distance):
         self.max_age = max_age
         self.min_hits = min_hits
         self.max_valid_distance = max_valid_distance
