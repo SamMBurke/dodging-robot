@@ -31,12 +31,12 @@ class LidarObjectDetectorNode(Node):
         )
 
     def scan_callback(self, msg):
-        self.get_logger().info(f'Received scan with {len(msg.ranges)} points')
+        # self.get_logger().info(f'Received scan with {len(msg.ranges)} points')
         self._clusters = self.cluster_points(msg) # cluster the data points
-        self.get_logger().info(f'Found {len(self._clusters)} clusters')
+        # self.get_logger().info(f'Found {len(self._clusters)} clusters')
 
         self.objects = self.get_objects(self._clusters) # fit rectangles onto those clusters to get objects
-        self.get_logger().info(f'Fitted {len(self.objects)} objects')
+        # self.get_logger().info(f'Fitted {len(self.objects)} objects')
         
         ros_msg = self.convert_to_ros(self.objects, msg.header) # convert those objects into a ROS2 message of detected objects
         self.publisher.publish(ros_msg) # publish the ROS2 message

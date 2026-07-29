@@ -6,6 +6,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
+from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist, Point
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker, MarkerArray
@@ -74,14 +75,22 @@ class ObstacleAvoidanceNode(Node):
             Odometry,
             '/odom',
             self.odom_callback,
-            10
+            qos_profile_sensor_data
         )
 
         # Vel cmd
-        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.cmd_pub = self.create_publisher(
+            Twist, 
+            '/cmd_vel', 
+            10
+        )
 
         # Debug visualization -- shows the locked evasion point and planned direction in RViz2
-        self.marker_pub = self.create_publisher(MarkerArray, '/oa_debug_markers', 10)
+        self.marker_pub = self.create_publisher(
+            MarkerArray, 
+            '/oa_debug_markers', 
+            10
+        )
 
         # Control timer (10 Hz)
         self.timer = self.create_timer(0.1, self.control_loop)
@@ -322,14 +331,13 @@ class ObstacleAvoidanceNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+
     node = ObstacleAvoidanceNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        node.get_logger().info("Node interrupted by user (Ctrl+C)")
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
+    
+    rclpy.spin(node)
+    
+    node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
