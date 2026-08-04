@@ -30,7 +30,9 @@ class ObstacleAvoidanceNode(Node):
         super().__init__('oa_node')
 
         # Parameter initialization
-        self.R = 0.5                # Contact zone
+        self.R = 1.5                # Contact zone
+        self.engagement_radius = 3    # the radius in which the robot actually reacts to incoming obstacles
+                                        # this way, objects that are far out and noisy aren't reacted to
         self.robot_radius = 0.22
         self.v_max = 0.31
         self.omega_max = 1.90
@@ -152,6 +154,9 @@ class ObstacleAvoidanceNode(Node):
 
         for obj in self.tracked_objects_msg.objects:
             x_o, y_o = global_to_local(obj.center.x, obj.center.y, robot_pose)
+            if math.hypot(x_o, y_o) > self.engagement_radius:
+                continue # object is outside the engagement radius => don't react
+
             vx_o, vy_o = global_to_local_vector(obj.velocity.x, obj.velocity.y, robot_pose)
 
             if abs(vx_o) < 1e-8 and abs(vy_o) < 1e-8:
