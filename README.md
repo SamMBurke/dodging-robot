@@ -84,7 +84,6 @@ dodging-robot/
         │   │                                 #   CPA gating, candidate generation, cost
         │   │                                 #   function, hysteresis lock, velocity command)
         │   ├── oa_node.py                    # ObstacleAvoidanceNode
-        │   ├── fake_detection_publisher.py   # synthetic /detected_objects for testing
         │   └── tracked_objects_visualizer.py # /tracked_objects -> RViz2 markers
         ├── launch/
         │   └── dodging_robot.launch.py       # starts the full pipeline + RViz2
