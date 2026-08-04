@@ -32,6 +32,7 @@ setup(
             'lidar_object_detector_node = project_pkg.object_detector:main',
             'object_tracker_node = project_pkg.object_tracker:main',
             'tracked_objects_visualizer = project_pkg.tracked_objects_visualizer:main',
+            'oa_node = project_pkg.oa_node:main',
             'fake_detection_publisher = project_pkg.fake_detection_publisher:main',
         ],
     },
